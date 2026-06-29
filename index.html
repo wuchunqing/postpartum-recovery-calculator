@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postpartum Recovery Calculator — Personalized Healing Timeline</title>
+  <meta name="description" content="Free postpartum recovery calculator. Get a week-by-week healing timeline, activity guidance, pelvic floor milestones, and visit reminders based on delivery type. ACOG informed.">
+  <meta name="google-site-verification" content="uz_j2c_UOuyTXyW6W87egnN8gHCyfSqm3kyY_XEx62w" />
+  <meta name="theme-color" content="#7C3AED">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary:#7C3AED;--primary-dark:#6D28D9;--primary-light:#EDE9FE;
+      --accent:#F59E0B;--teal:#14B8A6;--ink:#4C1D95;--muted:#64748B;--line:#E2E8F0;
+      --bg:#FAF5FF;--card:#fff;--radius:16px;
+      --shadow:0 8px 32px rgba(124,58,237,.09);
+      --ok:#059669;--warn:#D97706;--alert:#DC2626;
+    }
+    body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:#1E293B;line-height:1.65;font-size:15px;overflow:hidden}
+    #app-shell{position:fixed;inset:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:2147483647;background:var(--bg);pointer-events:auto}
+    #main-app{position:relative;z-index:100;pointer-events:auto}
+    #calc-zone{position:relative;z-index:99999;pointer-events:auto;isolation:isolate}
+    .card,.sidebar-card,.guide-card,details,.input,.select,.btn-main,.btn-ghost,summary,label,header,footer,section.hero,.check-item{position:relative;pointer-events:auto;touch-action:manipulation}
+    .container{max-width:1080px;margin:0 auto;padding:0 20px}
+    header{background:rgba(255,255,255,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:16px 0;position:sticky;top:0;z-index:50}
+    .logo{font-size:20px;font-weight:800;color:var(--primary);text-decoration:none}
+    .hero{padding:40px 0 22px;text-align:center;background:linear-gradient(165deg,#EDE9FE 0%,#FEF3C7 45%,#FAF5FF 100%)}
+    .hero-badge{display:inline-block;background:var(--primary-light);color:var(--primary-dark);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:6px 14px;border-radius:999px;border:1px solid #DDD6FE;margin-bottom:12px}
+    .hero h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.03em;margin-bottom:8px;color:#4C1D95}
+    .hero p{max-width:640px;margin:0 auto;color:var(--muted);font-size:15px}
+    .layout{display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start;margin-bottom:32px;isolation:isolate}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:28px;position:relative;z-index:50}
+    .card h2{font-size:18px;font-weight:800;margin-bottom:4px;color:#4C1D95}
+    .card .sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:16px}
+    label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:5px}
+    .input,.select{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:11px;font:inherit;font-size:14px;font-weight:600;background:#fff;outline:none;pointer-events:auto;-webkit-user-select:text;user-select:text}
+    .input:focus,.select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+    .select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%2364748B' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .hint{font-size:12px;color:var(--muted);padding:11px 12px;background:#F8FAFC;border-radius:10px;border-left:3px solid var(--accent);margin-bottom:16px}
+    .sym-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+    .check-item{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-weight:600;color:#475569;cursor:pointer;background:#fff}
+    .check-item input{margin-top:2px;accent-color:var(--primary);pointer-events:auto}
+    .check-item:has(input:checked){border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark)}
+    .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-main{flex:1;min-width:140px;padding:14px 20px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;border:none;border-radius:11px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;touch-action:manipulation;pointer-events:auto}
+    .btn-main:hover{filter:brightness(1.05)}
+    .btn-ghost{padding:14px 20px;border:1.5px solid var(--line);border-radius:11px;background:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--muted);touch-action:manipulation;pointer-events:auto}
+    .results{display:none;margin-top:24px;padding-top:22px;border-top:1px solid var(--line)}
+    .results.show{display:block}
+    .result-hero{text-align:center;background:linear-gradient(145deg,#8B5CF6,#F59E0B);color:#fff;border-radius:18px;padding:26px;margin-bottom:16px}
+    .result-hero .lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.92}
+    .result-hero .val{font-size:clamp(22px,5vw,32px);font-weight:900;line-height:1.2;margin:8px 0 4px}
+    .result-hero .sub{font-size:14px;opacity:.9}
+    .progress-wrap{display:flex;align-items:center;gap:20px;margin:18px 0;padding:18px;background:var(--primary-light);border:1px solid #DDD6FE;border-radius:16px}
+    .ring{--p:0;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--primary) calc(var(--p)*1%),#E2E8F0 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ring-inner{width:72px;height:72px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:var(--primary-dark)}
+    .ring-inner .rp{font-size:20px;line-height:1}
+    .ring-inner .rl{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:700}
+    .progress-text{flex:1}
+    .progress-text h3{font-size:15px;font-weight:800;margin-bottom:4px;color:#4C1D95}
+    .progress-text p{font-size:13px;color:var(--muted)}
+    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+    .result-cell{background:#F8FAFC;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+    .result-cell .k{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .result-cell .v{font-size:14px;font-weight:800}
+    .result-cell .v.ok{color:var(--ok)}
+    .result-cell .v.warn{color:var(--warn)}
+    .result-cell .v.alert{color:var(--alert)}
+    .phase-bar-wrap{margin:18px 0}
+    .phase-bar-label{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between}
+    .phase-bar{display:flex;height:28px;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+    .phase-seg{flex:1;min-width:0;position:relative}
+    .phase-seg.done{background:var(--primary)}
+    .phase-seg.current{background:linear-gradient(90deg,var(--primary),#C4B5FD)}
+    .phase-seg.upcoming{background:#F1F5F9}
+    .phase-legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 18px;font-size:11px;font-weight:600;color:var(--muted)}
+    .phase-legend span{display:flex;align-items:center;gap:5px}
+    .phase-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+    .milestone-list{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+    .milestone{display:flex;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);font-size:13px;align-items:flex-start}
+    .milestone.done{background:#ECFDF5;border-color:#A7F3D0}
+    .milestone.current{background:var(--primary-light);border-color:#DDD6FE}
+    .milestone.upcoming{background:#F8FAFC}
+    .milestone .icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-weight:800}
+    .milestone.done .icon{background:#D1FAE5;color:var(--ok)}
+    .milestone.current .icon{background:#DDD6FE;color:var(--primary-dark)}
+    .milestone.upcoming .icon{background:#E2E8F0;color:var(--muted)}
+    .milestone .mt{font-weight:800;color:#1E293B;margin-bottom:2px}
+    .milestone .md{color:var(--muted);font-size:12px;line-height:1.5}
+    .activity-box{padding:16px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:14px;margin:16px 0}
+    .activity-box h3{font-size:14px;font-weight:800;color:#92400E;margin-bottom:8px}
+    .activity-box ul{padding-left:18px;font-size:13px;color:#78350F;line-height:1.7}
+    .summary-table{width:100%;border-collapse:collapse;font-size:14px}
+    .summary-table td{padding:9px 0;border-bottom:1px solid var(--line)}
+    .summary-table td:first-child{color:var(--muted);font-weight:600;width:52%}
+    .summary-table td:last-child{font-weight:700;text-align:right}
+    .note-box{margin-top:14px;padding:12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;font-size:12px;color:#92400E;line-height:1.6}
+    .tip-box{margin-top:12px;padding:12px;background:var(--primary-light);border:1px solid #DDD6FE;border-radius:10px;font-size:13px;color:var(--primary-dark);line-height:1.6}
+    .warn-box{margin-top:12px;padding:12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;font-size:12px;color:#991B1B;line-height:1.6}
+    .sidebar{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;overflow:hidden;pointer-events:none}
+    .sidebar .sidebar-card,.sidebar .sidebar-card *,.sidebar .btn-ghost,.sidebar .ad-sidebar,.sidebar .ad-sidebar iframe{pointer-events:auto}
+    .sidebar-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+    .sidebar-card h3{font-size:14px;font-weight:800;margin-bottom:10px}
+    .ref-table{width:100%;font-size:12px;border-collapse:collapse}
+    .ref-table td{padding:6px 0;border-bottom:1px dashed var(--line)}
+    .ref-table td:last-child{text-align:right;font-weight:700}
+    .guide-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:24px 0}
+    .guide-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+    .guide-card h2{font-size:16px;font-weight:800;margin-bottom:8px}
+    .guide-card p,.guide-card li{font-size:14px;color:var(--muted)}
+    .guide-card ul{padding-left:18px;margin-top:6px}
+    details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+    details[open]{border-color:var(--primary)}
+    summary{padding:13px 16px;font-weight:700;cursor:pointer;list-style:none;font-size:14px}
+    summary::-webkit-details-marker{display:none}
+    details p{padding:0 16px 14px;font-size:13px;color:var(--muted);line-height:1.65}
+    footer{text-align:center;padding:24px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);background:#fff}
+    .ad-top,.ad-mid,.ad-sidebar,.ad-bottom{display:flex;justify-content:center;align-items:center;margin:12px auto;overflow:hidden!important;position:relative;z-index:1!important;flex-shrink:0;transform:translateZ(0);contain:strict;isolation:isolate;clip-path:inset(0 round 0);pointer-events:none}
+    .ad-top iframe,.ad-mid iframe,.ad-sidebar iframe,.ad-bottom iframe{position:relative!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;border:0;display:block;pointer-events:auto!important;transform:none!important}
+    .ad-top{width:100%;max-width:728px;height:90px!important;max-height:90px!important;min-height:90px}
+    .ad-mid{width:100%;max-width:728px;height:90px!important;max-height:90px!important;min-height:90px;margin:8px auto 24px}
+    .ad-top>*,.ad-mid>*,.ad-sidebar>*,.ad-bottom>*{max-width:100%!important;max-height:100%!important;overflow:hidden!important;pointer-events:none!important}
+    .ad-top iframe,.ad-mid iframe,.ad-sidebar iframe,.ad-bottom iframe{pointer-events:auto!important}
+    .ad-sidebar{width:100%;max-width:300px;height:250px!important;max-height:250px!important;min-height:250px;border-radius:var(--radius)}
+    .ad-bottom{width:100%;max-width:320px;height:50px!important;max-height:50px!important;min-height:50px}
+    #ad-popunder{display:none;width:0;height:0;overflow:hidden;position:absolute;left:-9999px}
+    @media(max-width:860px){.layout,.form-grid,.result-grid,.guide-grid,.sym-grid{grid-template-columns:1fr}.progress-wrap{flex-direction:column;text-align:center}}
+  </style>
+</head>
+<body>
+<script>
+(function(){
+  function isAdBox(el){
+    return el&&(el.closest('.ad-top,.ad-mid,.ad-sidebar,.ad-bottom')||el.classList&&el.classList.contains('ad-top'));
+  }
+  function isCalcZone(el){
+    return el&&(el.closest('#calc-zone')||el.closest('main.card')||el.closest('header')||el.closest('footer'));
+  }
+  function blockOverlay(n){
+    if(!n||n.nodeType!==1||n.id==='app-shell'||n.id==='ad-popunder')return;
+    if(isCalcZone(n))return;
+    n.style.pointerEvents='none';
+    n.style.setProperty('z-index','0','important');
+    var cs=window.getComputedStyle(n);
+    var r=n.getBoundingClientRect();
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var fullScreen=r.width>=vw*0.85&&r.height>=vh*0.5;
+    if(fullScreen||(cs.position==='fixed'||cs.position==='absolute')){
+      var z=parseInt(cs.zIndex,10);
+      if(fullScreen||(!isNaN(z)&&z>1))n.style.setProperty('display','none','important');
+    }
+  }
+  function clampAdIframe(f){
+    var box=f.closest('.ad-top,.ad-mid,.ad-sidebar,.ad-bottom');
+    if(!box)return;
+    f.style.setProperty('position','relative','important');
+    f.style.setProperty('inset','auto','important');
+    f.style.setProperty('top','auto','important');
+    f.style.setProperty('left','auto','important');
+    f.style.setProperty('width','100%','important');
+    f.style.setProperty('height','100%','important');
+    f.style.setProperty('max-width',box.clientWidth+'px','important');
+    f.style.setProperty('max-height',box.clientHeight+'px','important');
+    f.style.setProperty('transform','none','important');
+    var fr=f.getBoundingClientRect(),br=box.getBoundingClientRect();
+    if(fr.width>br.width+8||fr.height>br.height+8||fr.left<br.left-8){
+      f.style.setProperty('pointer-events','none','important');
+    }
+  }
+  function sanitizeIframes(){
+    document.querySelectorAll('iframe').forEach(function(f){
+      if(f.closest('.ad-top,.ad-mid,.ad-sidebar,.ad-bottom')){clampAdIframe(f);return;}
+      var cs=window.getComputedStyle(f);
+      var r=f.getBoundingClientRect();
+      if(cs.position==='fixed'||cs.position==='absolute'||r.width>320||r.height>260){
+        f.style.setProperty('pointer-events','none','important');
+        f.style.setProperty('display','none','important');
+      }
+    });
+  }
+  function scanAll(){
+    if(document.body){
+      Array.prototype.forEach.call(document.body.children,function(el){
+        if(el.id!=='app-shell')blockOverlay(el);
+      });
+    }
+    document.querySelectorAll('#app-shell div,#app-shell iframe').forEach(function(el){
+      if(isAdBox(el)||isCalcZone(el))return;
+      var cs=window.getComputedStyle(el);
+      if(el.tagName!=='IFRAME'&&cs.position!=='fixed'&&cs.position!=='absolute')return;
+      var r=el.getBoundingClientRect();
+      if(r.width>=window.innerWidth*0.7&&r.height>=window.innerHeight*0.4){
+        el.style.setProperty('display','none','important');
+        el.style.pointerEvents='none';
+      }
+    });
+    sanitizeIframes();
+  }
+  function watch(){
+    if(!document.body)return;
+    scanAll();
+    new MutationObserver(scanAll).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
+    var n=0,t=setInterval(function(){scanAll();if(++n>100)clearInterval(t);},300);
+  }
+  window.__scanAds=scanAll;
+  if(document.body)watch();
+  else document.addEventListener('DOMContentLoaded',watch);
+})();
+</script>
+<div id="app-shell">
+<header><div class="container"><a href="#" class="logo">Postpartum Recovery Calculator</a></div></header>
+
+<section class="hero">
+  <div class="container">
+    <span class="hero-badge">Fourth trimester guide</span>
+    <h1>Postpartum Recovery Calculator</h1>
+    <p>Build a personalized week-by-week recovery plan after birth — activity guidance, pelvic floor milestones, visit reminders, and warning signs. Inspired by ACOG, BabyCenter &amp; XennTool.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="ad-top" id="ad-top">
+    <!-- 顶部广告脚本（加了属性） -->
+    <script data-cfasync="false" async src="https://adsterra-xxx1.js"></script>
+  </div>
+</div>
+
+<div id="main-app">
+<div class="container">
+  <div class="layout">
+    <main class="card">
+      <div id="calc-zone">
+      <h2>Build your recovery plan</h2>
+      <p class="sub">Recovery is gradual — not a single 6-week checkpoint. We map your delivery type, weeks postpartum, and symptoms to practical milestones aligned with ACOG guidance.</p>
+
+      <div class="form-grid">
+        <div>
+          <label for="deliveryDate">Baby's birth date</label>
+          <input class="input" type="date" id="deliveryDate">
+        </div>
+        <div>
+          <label for="deliveryType">Delivery type</label>
+          <select class="select" id="deliveryType">
+            <option value="vaginal" selected>Vaginal birth</option>
+            <option value="assisted">Assisted (forceps / vacuum)</option>
+            <option value="csection">C-section</option>
+          </select>
+        </div>
+        <div>
+          <label for="tearLevel">Perineal tear / episiotomy</label>
+          <select class="select" id="tearLevel">
+            <option value="none" selected>None / minor</option>
+            <option value="moderate">2nd degree tear</option>
+            <option value="major">3rd–4th degree tear</option>
+          </select>
+        </div>
+        <div>
+          <label for="firstBirth">Birth history</label>
+          <select class="select" id="firstBirth">
+            <option value="first" selected>First baby</option>
+            <option value="repeat">Second or later baby</option>
+          </select>
+        </div>
+        <div>
+          <label for="feeding">Feeding mode</label>
+          <select class="select" id="feeding">
+            <option value="exclusive" selected>Exclusive breastfeeding</option>
+            <option value="partial">Partial breastfeeding</option>
+            <option value="formula">Mostly formula</option>
+          </select>
+        </div>
+        <div>
+          <label for="complications">Delivery complications</label>
+          <select class="select" id="complications">
+            <option value="none" selected>None</option>
+            <option value="hemorrhage">Postpartum hemorrhage</option>
+            <option value="preterm">Preterm birth (&lt;37 weeks)</option>
+            <option value="preeclampsia">Preeclampsia / hypertension</option>
+          </select>
+        </div>
+      </div>
+
+      <label style="margin-bottom:8px">Current symptoms (check all that apply)</label>
+      <div class="sym-grid">
+        <label class="check-item"><input type="checkbox" id="symBleeding" value="bleeding"> Heavy or worsening bleeding</label>
+        <label class="check-item"><input type="checkbox" id="symFever" value="fever"> Fever or foul-smelling discharge</label>
+        <label class="check-item"><input type="checkbox" id="symPain" value="pain"> Severe pain / incision not healing</label>
+        <label class="check-item"><input type="checkbox" id="symMood" value="mood"> Persistent low mood or anxiety</label>
+        <label class="check-item"><input type="checkbox" id="symLeak" value="leak"> Urinary or fecal incontinence</label>
+        <label class="check-item"><input type="checkbox" id="symDiastasis" value="diastasis"> Abdominal bulging (diastasis)</label>
+      </div>
+      <p class="hint">Pelvic floor exercises can start early, but high-impact activity (running, jumping) should wait until cleared — often 12+ weeks after C-section or when symptom-free.</p>
+
+      <div class="btn-row">
+        <button type="button" class="btn-main" id="btnCalc" onclick="calculate();return false;">Calculate recovery plan</button>
+        <button type="button" class="btn-ghost" id="btnReset">Reset</button>
+      </div>
+
+      <div class="results" id="results"></div>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Recovery phase overview</h3>
+        <table class="ref-table">
+          <tr><td>0–2 weeks</td><td>Rest &amp; healing</td></tr>
+          <tr><td>2–6 weeks</td><td>Gentle mobility</td></tr>
+          <tr><td>6–12 weeks</td><td>Strengthening</td></tr>
+          <tr><td>3–6 months</td><td>Endurance build</td></tr>
+          <tr><td>6–12 months</td><td>Return to sport</td></tr>
+        </table>
+      </div>
+      <div class="sidebar-card">
+        <h3>Quick example</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px">Vaginal birth · 4 weeks ago · Exclusive BF → early recovery phase, gentle walks &amp; pelvic floor focus.</p>
+        <button type="button" class="btn-ghost" style="width:100%" id="btnExample">Load example</button>
+      </div>
+      <div class="sidebar-card">
+        <h3>ACOG visit reminders</h3>
+        <ul style="list-style:none;font-size:12px;color:var(--muted);line-height:1.9">
+          <li>· Contact clinician within 3 weeks</li>
+          <li>· Comprehensive visit by 12 weeks</li>
+          <li>· Mood screening at every visit</li>
+          <li>· Pelvic floor PT if incontinence</li>
+        </ul>
+      </div>
+      <div class="sidebar-card">
+        <h3>How recovery timelines work</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7">Healing varies by delivery type, tear severity, and complications. This tool translates population guidelines (ACOG, Canadian postpartum activity guideline) into a personalized map — not a substitute for your provider's clearance.</p>
+      </div>
+      <div class="sidebar-card">
+        <h3>Red flags — call your provider</h3>
+        <ul style="font-size:12px;color:var(--muted);line-height:1.9;padding-left:18px;margin-top:6px">
+          <li>Soaking more than one pad per hour</li>
+          <li>Fever above 100.4°F (38°C)</li>
+          <li>Severe headache, vision changes, shortness of breath</li>
+          <li>Incision redness, drainage, or opening</li>
+          <li>Thoughts of harming yourself or your baby</li>
+        </ul>
+      </div>
+      <div class="ad-sidebar" id="ad-sidebar"></div>
+    </aside>
+  </div>
+
+  <div class="ad-mid" id="ad-mid">
+    <!-- 文中广告脚本（加了属性） -->
+    <script data-cfasync="false" async src="https://adsterra-xxx2.js"></script>
+  </div>
+
+  <section style="margin-bottom:28px">
+    <h2 style="font-size:18px;font-weight:800;margin-bottom:12px">FAQ</h2>
+    <details>
+      <summary>When can I start exercising after birth?</summary>
+      <p>ACOG supports resuming activity as soon as medically safe. Many women start gentle walking within days after uncomplicated vaginal birth. Strenuous exercise typically waits until your 6-week checkup — and 12+ weeks after C-section. Progress gradually and stop if bleeding increases or pain worsens.</p>
+    </details>
+    <details>
+      <summary>How long does postpartum bleeding last?</summary>
+      <p>Lochia usually transitions from red to pink to yellow-white over 4–6 weeks. Contact your provider if bleeding suddenly increases, clots are larger than a golf ball, or you soak a pad in an hour.</p>
+    </details>
+    <details>
+      <summary>When can I run or lift weights again?</summary>
+      <p>Wait until you can walk 30 minutes without symptoms, pelvic floor control is good, and any incision or tear has healed. Many guidelines suggest 12 weeks minimum before running after C-section; vaginal birth may be earlier with provider clearance.</p>
+    </details>
+    <details>
+      <summary>Is it normal to feel exhausted months later?</summary>
+      <p>Yes — sleep deprivation, hormones, and healing all contribute. Persistent fatigue beyond 12 weeks, or symptoms of depression, deserve a clinical evaluation. You are not alone; help is available.</p>
+    </details>
+  </section>
+</div>
+</div>
+
+<div class="container">
+  <div class="ad-bottom" id="ad-bottom">
+    <!-- 底部广告脚本（加了属性） -->
+    <script data-cfasync="false" async src="https://adsterra-xxx3.js"></script>
+  </div>
+</div>
+
+<div id="ad-popunder" aria-hidden="true"></div>
+
+<footer>
+  <div class="container">Postpartum Recovery Calculator — inspired by <a href="https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2020/04/physical-activity-and-exercise-during-pregnancy-and-the-postpartum-period" style="color:var(--primary)">ACOG</a> &amp; BabyCenter. Not medical advice.</div>
+</footer>
+</div>
+
+<script>
+function byId(id){return document.getElementById(id);}
+
+function addDays(d,n){
+  var r=new Date(d);
+  r.setDate(r.getDate()+n);
+  return r;
+}
+
+function daysBetween(a,b){
+  return Math.floor((b-a)/86400000);
+}
+
+function formatDate(d){
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+
+function formatShort(d){
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+var PHASES=[
+  {id:0,name:'Immediate healing',weeks:'0–2',start:0,end:14},
+  {id:1,name:'Early recovery',weeks:'2–6',start:14,end:42},
+  {id:2,name:'Strengthening',weeks:'6–12',start:42,end:84},
+  {id:3,name:'Rebuilding',weeks:'3–6 mo',start:84,end:182},
+  {id:4,name:'Full return',weeks:'6–12 mo',start:182,end:365}
+];
+
+function getSymptoms(){
+  return['symBleeding','symFever','symPain','symMood','symLeak','symDiastasis'].filter(function(id){
+    var el=byId(id);
+    return el&&el.checked;
+  }).map(function(id){return byId(id).value;});
+}
+
+function compute(input){
+  var delivery=new Date(input.delivery+'T12:00:00');
+  var today=new Date();today.setHours(12,0,0,0);
+  var daysPP=Math.max(0,daysBetween(delivery,today));
+  var weeksPP=daysPP/7;
+
+  var csDelay=input.deliveryType==='csection'?14:0;
+  var assistDelay=input.deliveryType==='assisted'?7:0;
+  var tearDelay=input.tearLevel==='moderate'?7:input.tearLevel==='major'?21:0;
+  var compDelay=input.complications!=='none'?14:0;
+
+  var phaseIdx=0;
+  for(var i=PHASES.length-1;i>=0;i--){
+    if(daysPP>=PHASES[i].start){phaseIdx=i;break;}
+  }
+  var phase=PHASES[phaseIdx];
+  var nextPhase=PHASES[Math.min(phaseIdx+1,PHASES.length-1)];
+
+  var progressPct=Math.min(100,Math.round((daysPP/365)*100));
+  var phaseProgress=Math.min(100,Math.round(((daysPP-phase.start)/(phase.end-phase.start))*100));
+
+  var recoveryScore=Math.min(100,Math.round(progressPct*0.6+phaseProgress*0.4));
+  if(input.deliveryType==='csection'&&weeksPP<6)recoveryScore=Math.min(recoveryScore,35);
+  if(input.deliveryType==='vaginal'&&weeksPP<2)recoveryScore=Math.min(recoveryScore,20);
+
+  var symptoms=getSymptoms();
+  var alertCount=symptoms.length;
+  recoveryScore=Math.max(5,recoveryScore-alertCount*12);
+
+  var checkup6=addDays(delivery,42+csDelay);
+  var checkup12=addDays(delivery,84);
+  var contact3=addDays(delivery,21);
+  var lochiaEnd=addDays(delivery,42);
+  var gentleWalk=addDays(delivery,input.deliveryType==='csection'?5:2);
+  var strengthClear=addDays(delivery,42+csDelay+tearDelay);
+  var runClear=addDays(delivery,84+csDelay+assistDelay+tearDelay);
+  var sexClear=addDays(delivery,42+Math.max(csDelay,tearDelay));
+
+  var lochiaStatus=daysPP<=14?'Heavy to moderate (red) — normal if decreasing':daysPP<=28?'Lightening (pink/brown) — should taper':daysPP<=42?'Scant yellow-white discharge — nearing end':'Lochia usually resolved — report any new red bleeding';
+
+  var activity=[];
+  if(weeksPP<2){
+    activity.push('Prioritize rest, hydration, and skin-to-skin with baby');
+    activity.push('Short walks around the house when comfortable');
+    activity.push('Begin gentle pelvic floor breathing (no straining)');
+    if(input.deliveryType==='csection')activity.push('Support incision when coughing or laughing');
+  }else if(weeksPP<6){
+    activity.push('10–15 minute gentle walks, 1–2× daily if tolerated');
+    activity.push('Daily pelvic floor contractions (Kegels) — 3 sets of 10');
+    activity.push('Avoid lifting heavier than your baby + car seat');
+    if(input.deliveryType==='csection')activity.push('No abdominal crunches or heavy core work yet');
+  }else if(weeksPP<12){
+    activity.push('Gradual return to moderate activity if cleared at 6-week visit');
+    activity.push('Add bodyweight squats, bridges, and postnatal core activation');
+    activity.push('Target 120 min/week moderate activity (Canadian guideline)');
+    if(input.deliveryType==='csection')activity.push('Wait for provider clearance before running or HIIT');
+  }else if(weeksPP<26){
+    activity.push('Build endurance with walking, swimming, or cycling');
+    activity.push('Consider pelvic floor physiotherapy if any leakage persists');
+    activity.push('Progress resistance training 2–3× per week');
+  }else{
+    activity.push('Return to higher-intensity workouts if symptom-free');
+    activity.push('Use run-readiness tests before jumping/running');
+    activity.push('Continue pelvic floor maintenance long-term');
+  }
+
+  if(symptoms.indexOf('bleeding')>=0)activity.unshift('⚠ Pause intensity — heavy bleeding needs urgent evaluation');
+  if(symptoms.indexOf('pain')>=0)activity.unshift('⚠ Reduce activity until pain is assessed by your provider');
+
+  var milestones=[
+    {week:0,title:'Birth &amp; bonding',desc:'Rest, initiate feeding, monitor lochia and pain.',done:daysPP>=0},
+    {week:0.3,title:'Early mobilization',desc:'Gentle walking when ready — prevents blood clots.',done:daysPP>=2},
+    {week:3,title:'3-week contact',desc:'ACOG recommends clinician contact by 3 weeks postpartum.',done:daysPP>=21},
+    {week:6,title:'6-week postpartum visit',desc:'Incision/tear check, mood screen, contraception, activity clearance.',done:daysPP>=42+csDelay},
+    {week:6,title:'Lochia typically ends',desc:'Bleeding should be minimal; report any fresh heavy flow.',done:daysPP>=42},
+    {week:12,title:'12-week comprehensive visit',desc:'Full postpartum assessment if not completed earlier.',done:daysPP>=84},
+    {week:12,title:'High-impact clearance window',desc:'Running/jumping may be considered if symptom-free (later after C-section).',done:daysPP>=84+csDelay},
+    {week:26,title:'Mid-year recovery checkpoint',desc:'Pelvic floor and core should be stabilizing; PT if symptoms persist.',done:daysPP>=182},
+    {week:52,title:'One-year recovery milestone',desc:'Most women reach baseline strength; hormones continue to normalize.',done:daysPP>=365}
+  ];
+
+  var statusLabel='On track for '+phase.name.toLowerCase();
+  if(alertCount>=2)statusLabel='Slow down — symptoms need attention';
+  else if(alertCount===1)statusLabel='Proceed gently — monitor symptoms closely';
+
+  var tip='Recovery is not linear. Sleep when you can, accept help, and celebrate small wins each week.';
+  if(input.feeding==='exclusive')tip='Exclusive breastfeeding adds energy demands — prioritize nutrition and hydration alongside rest.';
+  if(input.complications!=='none')tip='Your delivery had complications — follow your care team\'s specific recovery instructions closely.';
+  if(weeksPP>=6&&weeksPP<12)tip='Your 6–12 week window is ideal for pelvic floor assessment. Mention any leakage, pressure, or pain at your visit.';
+
+  return{
+    delivery,daysPP,weeksPP:Math.floor(weeksPP*10)/10,phase,phaseIdx,nextPhase,
+    progressPct,phaseProgress,recoveryScore,statusLabel,
+    checkup6,checkup12,contact3,lochiaEnd,gentleWalk,strengthClear,runClear,sexClear,
+    lochiaStatus,activity,milestones,tip,alertCount,symptoms,
+    csDelay,assistDelay,tearDelay
+  };
+}
+
+function buildPhaseBar(r){
+  var segs=PHASES.map(function(p,i){
+    var cls=i<r.phaseIdx?'done':i===r.phaseIdx?'current':'upcoming';
+    return '<div class="phase-seg '+cls+'" title="'+p.name+'"></div>';
+  }).join('');
+  return '<div class="phase-bar-wrap"><div class="phase-bar-label"><span>Recovery phases</span><span>Week '+Math.floor(r.weeksPP)+'</span></div><div class="phase-bar">'+segs+'</div><div class="phase-legend">'+
+    PHASES.map(function(p){return '<span><i style="background:#7C3AED"></i> '+p.weeks+': '+p.name+'</span>';}).join('')+
+    '</div></div>';
+}
+
+function buildMilestones(list,r){
+  var html='';
+  list.forEach(function(m){
+    var st=m.done?'done':Math.abs(m.week-r.weeksPP)<2?'current':'upcoming';
+    var icon=m.done?'✓':st==='current'?'→':'·';
+    html+='<div class="milestone '+st+'"><div class="icon">'+icon+'</div><div><div class="mt">'+m.title+'</div><div class="md">'+m.desc+'</div></div></div>';
+  });
+  return '<div class="milestone-list">'+html+'</div>';
+}
+
+function deliveryLabel(v){
+  return{vaginal:'Vaginal birth',assisted:'Assisted delivery',csection:'C-section'}[v]||v;
+}
+
+function calculate(){
+  try{
+    var delivery=byId('deliveryDate').value;
+    if(!delivery){alert('Please enter your baby\'s birth date.');return;}
+    var del=new Date(delivery+'T12:00:00');
+    var today=new Date();today.setHours(12,0,0,0);
+    if(del>today){alert('Birth date cannot be in the future.');return;}
+
+    var input={
+      delivery:delivery,
+      deliveryType:byId('deliveryType').value,
+      tearLevel:byId('tearLevel').value,
+      firstBirth:byId('firstBirth').value,
+      feeding:byId('feeding').value,
+      complications:byId('complications').value
+    };
+    var r=compute(input);
+    var res=byId('results');
+
+    var warnHtml=r.alertCount>0?'<div class="warn-box"><strong>Symptoms flagged:</strong> You selected '+r.alertCount+' concern(s). Contact your OB/midwife promptly — do not rely on this calculator for urgent care.</div>':'';
+
+    res.innerHTML=
+      '<div class="result-hero"><div class="lbl">Current recovery phase</div><div class="val">'+r.phase.name+'</div><div class="sub">Week '+r.weeksPP+' postpartum · '+r.statusLabel+'</div></div>'+
+      '<div class="progress-wrap"><div class="ring" style="--p:'+r.recoveryScore+'"><div class="ring-inner"><span class="rp">'+r.recoveryScore+'%</span><span class="rl">Recovery</span></div></div><div class="progress-text"><h3>'+r.phase.name+' ('+r.phase.weeks+')</h3><p>You are '+r.phaseProgress+'% through this phase. Next: <strong>'+r.nextPhase.name+'</strong> starting around week '+Math.ceil(r.nextPhase.start/7)+'.</p></div></div>'+
+      '<div class="result-grid">'+
+        '<div class="result-cell"><div class="k">Days postpartum</div><div class="v">'+r.daysPP+' days</div></div>'+
+        '<div class="result-cell"><div class="k">Lochia status</div><div class="v">'+ (r.daysPP<=42?'Normal range':'Usually resolved')+'</div></div>'+
+        '<div class="result-cell"><div class="k">6-week clearance</div><div class="v'+(r.daysPP>=42?' ok':'')+'">'+formatShort(r.checkup6)+'</div></div>'+
+        '<div class="result-cell"><div class="k">Strength / exercise</div><div class="v">'+formatShort(r.strengthClear)+'</div></div>'+
+        '<div class="result-cell"><div class="k">High-impact (run)</div><div class="v">'+formatShort(r.runClear)+'</div></div>'+
+        '<div class="result-cell"><div class="k">12-week visit</div><div class="v">'+formatShort(r.checkup12)+'</div></div>'+
+      '</div>'+
+      buildPhaseBar(r)+
+      '<div class="activity-box"><h3>Activity guidance this week</h3><ul>'+r.activity.map(function(a){return '<li>'+a+'</li>';}).join('')+'</ul></div>'+
+      '<h3 style="font-size:14px;font-weight:800;margin-bottom:10px">Recovery milestones</h3>'+
+      buildMilestones(r.milestones,r)+
+      '<h3 style="font-size:14px;font-weight:800;margin:18px 0 10px">Summary</h3>'+
+      '<table class="summary-table">'+
+        '<tr><td>Birth date</td><td>'+formatDate(r.delivery)+'</td></tr>'+
+        '<tr><td>Delivery</td><td>'+deliveryLabel(input.deliveryType)+'</td></tr>'+
+        '<tr><td>Perineal injury</td><td>'+byId('tearLevel').selectedOptions[0].text+'</td></tr>'+
+        '<tr><td>Feeding</td><td>'+byId('feeding').selectedOptions[0].text+'</td></tr>'+
+        '<tr><td>Lochia guidance</td><td>'+r.lochiaStatus+'</td></tr>'+
+        '<tr><td>3-week contact</td><td>'+formatShort(r.contact3)+'</td></tr>'+
+        '<tr><td>Gentle walking OK</td><td>From '+formatShort(r.gentleWalk)+'</td></tr>'+
+        '<tr><td>Sexual activity (typical)</td><td>After clearance ~'+formatShort(r.sexClear)+'</td></tr>'+
+      '</table>'+
+      '<p class="tip-box"><strong>Tip:</strong> '+r.tip+'</p>'+
+      warnHtml+
+      '<p class="note-box"><strong>Note:</strong> For educational purposes only. Always follow your healthcare provider\'s personalized recovery plan — especially after C-section, major tears, or complications.</p>'+
+      '<div class="btn-row" style="margin-top:14px"><button type="button" class="btn-ghost" id="btnCopy">Copy results</button></div>';
+
+    res.classList.add('show');
+    window._lastResult=res.innerText;
+    var copyBtn=byId('btnCopy');
+    if(copyBtn)copyBtn.addEventListener('click',copyResults);
+    res.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(err){
+    console.error(err);
+    alert('Calculation error. Please refresh and try again.');
+  }
+}
+
+function resetForm(){
+  var d=new Date();
+  d.setDate(d.getDate()-28);
+  byId('deliveryDate').value=d.toISOString().slice(0,10);
+  byId('deliveryType').value='vaginal';
+  byId('tearLevel').value='none';
+  byId('firstBirth').value='first';
+  byId('feeding').value='exclusive';
+  byId('complications').value='none';
+  ['symBleeding','symFever','symPain','symMood','symLeak','symDiastasis'].forEach(function(id){
+    var el=byId(id);if(el)el.checked=false;
+  });
+  byId('results').classList.remove('show');
+  byId('results').innerHTML='';
+}
+
+function loadExample(){
+  resetForm();
+  calculate();
+}
+
+function copyResults(){
+  var t=window._lastResult||'';
+  if(!t)return;
+  navigator.clipboard.writeText(t.replace(/\s+/g,' ').trim()).then(function(){alert('Copied!');}).catch(function(){});
+}
+
+var adsLoaded=false;
+function loadAd(boxId,opts){
+  return new Promise(function(resolve){
+    var box=byId(boxId);
+    if(!box){resolve();return;}
+    window.atOptions=opts;
+    var s=document.createElement('script');
+    s.src='https://www.highperformanceformat.com/'+opts.key+'/invoke.js';
+    s.async=true;
+    s.onload=function(){setTimeout(function(){if(window.__scanAds)window.__scanAds();resolve();},200);};
+    s.onerror=resolve;
+    box.appendChild(s);
+  });
+}
+function loadPopunder(){
+  var box=byId('ad-popunder');
+  if(!box)return;
+  var s=document.createElement('script');
+  s.src='https://pl29627367.effectivecpmnetwork.com/ac/27/45/ac27452f559e8fad64d8d6406362e215.js';
+  s.async=true;
+  box.appendChild(s);
+}
+async function loadAds(){
+  if(adsLoaded)return;
+  adsLoaded=true;
+  await loadAd('ad-top',{key:'b31a21d357a574f5abfe948e08497cc3',format:'iframe',height:90,width:728,params:{}});
+  await loadAd('ad-bottom',{key:'5a3667e1a909df26029e97d7d01cf2b5',format:'iframe',height:50,width:320,params:{}});
+  await loadAd('ad-sidebar',{key:'5b2625d96c11d7b599cea160717bc0f6',format:'iframe',height:250,width:300,params:{}});
+  if(window.__scanAds)window.__scanAds();
+  /* popunder 会注入全屏透明层拦截点击，延迟 60 秒且在用户滚动到底部后加载 */
+  var popLoaded=false;
+  function tryPopunder(){
+    if(popLoaded)return;
+    popLoaded=true;
+    loadPopunder();
+    setTimeout(function(){if(window.__scanAds)window.__scanAds();},1000);
+  }
+  setTimeout(tryPopunder,60000);
+  window.addEventListener('scroll',function onScroll(){
+    if(window.scrollY+window.innerHeight>document.body.scrollHeight-200){
+      tryPopunder();
+      window.removeEventListener('scroll',onScroll);
+    }
+  },{passive:true});
+}
+
+function init(){
+  var d=new Date();
+  d.setDate(d.getDate()-28);
+  byId('deliveryDate').value=d.toISOString().slice(0,10);
+
+  byId('btnCalc').addEventListener('click',function(e){e.stopPropagation();calculate();});
+  byId('btnReset').addEventListener('click',function(e){e.stopPropagation();resetForm();});
+  byId('btnExample').addEventListener('click',function(e){e.stopPropagation();loadExample();});
+  ['deliveryDate','deliveryType','tearLevel','firstBirth','feeding','complications'].forEach(function(id){
+    byId(id).addEventListener('change',calculate);
+  });
+  ['symBleeding','symFever','symPain','symMood','symLeak','symDiastasis'].forEach(function(id){
+    byId(id).addEventListener('change',calculate);
+  });
+  calculate();
+  requestAnimationFrame(function(){requestAnimationFrame(loadAds);});
+}
+
+window.calculate=calculate;
+window.resetForm=resetForm;
+window.loadExample=loadExample;
+window.copyResults=copyResults;
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+</script>
+</body>
+</html>
